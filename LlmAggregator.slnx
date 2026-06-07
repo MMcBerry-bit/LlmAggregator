@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="LlmAggregator.csproj">
+    <Deploy />
+  </Project>
+</Solution>
