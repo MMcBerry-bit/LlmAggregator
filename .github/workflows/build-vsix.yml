@@ -1,0 +1,38 @@
+name: Build and package VSIX
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1
+
+      - name: Restore NuGet packages
+        run: nuget restore "LlmAggregator.slnx"
+
+      - name: Build VSIX (Release)
+        run: msbuild "LlmAggregator.csproj" /t:CreateVsixContainer /p:Configuration=Release
+
+      - name: Find built VSIX
+        run: |
+          Write-Host "Searching for VSIX under ./bin..."
+          Get-ChildItem -Path ./bin -Filter *.vsix -Recurse | Select-Object FullName
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LlmAggregator-vsix
+          path: |
+            ./bin/**/**/*.vsix
+            ./bin/**/*.vsix
